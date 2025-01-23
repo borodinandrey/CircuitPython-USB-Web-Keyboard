@@ -36,9 +36,12 @@ body {
 }
 .row {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px; /* Adjust as per your overall keyboard width */
+    margin: 0 auto;
 }
+
 .key {
     height: 50px;
     padding: 10px;
@@ -53,6 +56,21 @@ body {
     border-radius: 4px;
     margin: 2px;
 }
+
+.arrow-keys-row {
+    justify-content: space-between; /* Ensures alignment for arrow keys */
+}
+
+.spacer {
+    flex-grow: 1; /* Pushes arrow keys to the right */
+}
+
+.arrow-keys {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
 .key:hover {
     background: rgba(255, 255, 255, 0.1);
 }
@@ -90,4 +108,34 @@ body {
     font-size: 1em;
     color: #666;
     margin: 5px 0 0 0;
+}
+
+.bios-config {
+    margin-top: 30px;
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+form input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: calc(100% - 12px);
+}
+
+form button {
+    padding: 10px;
+    margin: 5px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #666;
 }

@@ -70,4 +70,8 @@ keycode_map = {
     "CTRL": Keycode.CONTROL,
     "ALT": Keycode.ALT,
     "SPACE": Keycode.SPACEBAR,
+    "LEFT": Keycode.LEFT_ARROW,
+    "UP": Keycode.UP_ARROW,
+    "DOWN": Keycode.DOWN_ARROW,
+    "RIGHT": Keycode.RIGHT_ARROW
 }

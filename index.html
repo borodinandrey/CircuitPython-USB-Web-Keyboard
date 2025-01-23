@@ -3,24 +3,95 @@
 <head>
     <title>On-Screen Keyboard</title>
     <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8" />
     <script>
+        // Sends a single key or key combination (e.g., "F8", "CTRL+V") in a POST request
         function sendKey(keyValue) {
             fetch('/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'key=' + encodeURIComponent(keyValue),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'key=' + encodeURIComponent(keyValue)
             })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Network response was not ok.');
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+        }
+
+        // Sends the entire typed string in ONE POST, preserving order + case
+        function sendFullString() {
+            const textToSend = document.getElementById('full-string').value.trim();
+            if (!textToSend) {
+                alert("Please enter some text to send.");
+                return;
+            }
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'key=' + encodeURIComponent(textToSend)
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+        }
+
+        // Save BIOS configuration
+        function saveBiosConfig() {
+            const key = document.getElementById('bios-key').value.toUpperCase().trim();
+            const repeats = parseInt(document.getElementById('bios-repeats').value, 10);
+            if (!key) {
+                alert('Please enter a valid key or combination.');
+                return;
+            }
+            fetch('/save_bios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `key=${encodeURIComponent(key)}&repetitions=${encodeURIComponent(repeats)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('bios-status').textContent = data;
+            })
+            .catch(error => {
+                console.error('Error saving BIOS configuration:', error);
+                document.getElementById('bios-status').textContent = 'Error saving BIOS configuration.';
+            });
+        }
+
+        // Remove BIOS configuration
+        function removeBiosConfig() {
+            const bodyData = 'key=&repetitions=0';
+            fetch('/save_bios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: bodyData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('bios-status').textContent = 'BIOS key configuration removed.';
+            })
+            .catch(error => {
+                console.error('Error removing BIOS configuration:', error);
+                document.getElementById('bios-status').textContent = 'Error removing BIOS configuration.';
+            });
+        }
+
+        // On page load, try to load an existing BIOS config
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/load_bios', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.key && data.repetitions) {
+                    document.getElementById('bios-key').value = data.key;
+                    document.getElementById('bios-repeats').value = data.repetitions;
+                    document.getElementById('bios-status').textContent =
+                        `Loaded BIOS key: ${data.key}, repeats: ${data.repetitions}`;
                 }
             })
             .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
+                console.error('Error loading BIOS configuration:', error);
+                document.getElementById('bios-status').textContent = 'Error loading BIOS configuration.';
             });
-        }
+        });
     </script>
 </head>
 <body>
@@ -28,7 +99,9 @@
         <h1>CircuitPython Wireless USB Web Keyboard</h1>
         <p>Click keys to send input</p>
     </div>
+
     <div class="wrapper">
+        <!-- On-Screen Keyboard -->
         <div class="keyboard">
             <!-- First Row -->
             <div class="row">
@@ -46,6 +119,7 @@
                 <button onclick="sendKey('F11')" class="key m-width">F11</button>
                 <button onclick="sendKey('F12')" class="key m-width">F12</button>
             </div>
+
             <!-- Second Row -->
             <div class="row">
                 <button onclick="sendKey('~')" class="key m-width">~</button>
@@ -61,68 +135,104 @@
                 <button onclick="sendKey('0')" class="key m-width">0</button>
                 <button onclick="sendKey('-')" class="key m-width">-</button>
                 <button onclick="sendKey('=')" class="key m-width">+</button>
-                <button onclick="sendKey('\\\\')" class="key m-width">\\</button>
+                <button onclick="sendKey('\\')" class="key m-width">\\</button>
                 <button onclick="sendKey('BACKSPACE')" class="key m-width vertical-center">&#8592;</button>
             </div>
+
             <!-- Third Row -->
             <div class="row">
                 <button onclick="sendKey('TAB')" class="key l-width vertical-center">Tab</button>
-                <button onclick="sendKey('Q')" class="key m-width">Q</button>
-                <button onclick="sendKey('W')" class="key m-width">W</button>
-                <button onclick="sendKey('E')" class="key m-width">E</button>
-                <button onclick="sendKey('R')" class="key m-width">R</button>
-                <button onclick="sendKey('T')" class="key m-width">T</button>
-                <button onclick="sendKey('Y')" class="key m-width">Y</button>
-                <button onclick="sendKey('U')" class="key m-width">U</button>
-                <button onclick="sendKey('I')" class="key m-width">I</button>
-                <button onclick="sendKey('O')" class="key m-width">O</button>
-                <button onclick="sendKey('P')" class="key m-width">P</button>
+                <!-- Changed these letters to lowercase in sendKey -->
+                <button onclick="sendKey('q')" class="key m-width">Q</button>
+                <button onclick="sendKey('w')" class="key m-width">W</button>
+                <button onclick="sendKey('e')" class="key m-width">E</button>
+                <button onclick="sendKey('r')" class="key m-width">R</button>
+                <button onclick="sendKey('t')" class="key m-width">T</button>
+                <button onclick="sendKey('y')" class="key m-width">Y</button>
+                <button onclick="sendKey('u')" class="key m-width">U</button>
+                <button onclick="sendKey('i')" class="key m-width">I</button>
+                <button onclick="sendKey('o')" class="key m-width">O</button>
+                <button onclick="sendKey('p')" class="key m-width">P</button>
                 <button onclick="sendKey('[')" class="key m-width">[</button>
                 <button onclick="sendKey(']')" class="key m-width">]</button>
                 <button class="key l-width">&nbsp;</button>
             </div>
+
             <!-- Fourth Row -->
             <div class="row">
                 <button onclick="sendKey('CAPSLOCK')" class="key xl-width vertical-center">Caps Lock</button>
-                <button onclick="sendKey('A')" class="key m-width">A</button>
-                <button onclick="sendKey('S')" class="key m-width">S</button>
-                <button onclick="sendKey('D')" class="key m-width">D</button>
-                <button onclick="sendKey('F')" class="key m-width">F</button>
-                <button onclick="sendKey('G')" class="key m-width">G</button>
-                <button onclick="sendKey('H')" class="key m-width">H</button>
-                <button onclick="sendKey('J')" class="key m-width">J</button>
-                <button onclick="sendKey('K')" class="key m-width">K</button>
-                <button onclick="sendKey('L')" class="key m-width">L</button>
+                <button onclick="sendKey('a')" class="key m-width">A</button>
+                <button onclick="sendKey('s')" class="key m-width">S</button>
+                <button onclick="sendKey('d')" class="key m-width">D</button>
+                <button onclick="sendKey('f')" class="key m-width">F</button>
+                <button onclick="sendKey('g')" class="key m-width">G</button>
+                <button onclick="sendKey('h')" class="key m-width">H</button>
+                <button onclick="sendKey('j')" class="key m-width">J</button>
+                <button onclick="sendKey('k')" class="key m-width">K</button>
+                <button onclick="sendKey('l')" class="key m-width">L</button>
                 <button onclick="sendKey(';')" class="key m-width">;</button>
                 <button onclick="sendKey('\'')" class="key m-width">'</button>
                 <button onclick="sendKey('ENTER')" class="key xl-width vertical-center">Enter</button>
             </div>
+
             <!-- Fifth Row -->
             <div class="row">
                 <button onclick="sendKey('SHIFT')" class="key xxl-width vertical-center">Shift</button>
-                <button onclick="sendKey('Z')" class="key m-width">Z</button>
-                <button onclick="sendKey('X')" class="key m-width">X</button>
-                <button onclick="sendKey('C')" class="key m-width">C</button>
-                <button onclick="sendKey('V')" class="key m-width">V</button>
-                <button onclick="sendKey('B')" class="key m-width">B</button>
-                <button onclick="sendKey('N')" class="key m-width">N</button>
-                <button onclick="sendKey('M')" class="key m-width">M</button>
+                <button onclick="sendKey('z')" class="key m-width">Z</button>
+                <button onclick="sendKey('x')" class="key m-width">X</button>
+                <button onclick="sendKey('c')" class="key m-width">C</button>
+                <button onclick="sendKey('v')" class="key m-width">V</button>
+                <button onclick="sendKey('b')" class="key m-width">B</button>
+                <button onclick="sendKey('n')" class="key m-width">N</button>
+                <button onclick="sendKey('m')" class="key m-width">M</button>
                 <button onclick="sendKey(',')" class="key m-width">,</button>
-                <button onclick="sendKey('.')", class="key m-width">.</button>
+                <button onclick="sendKey('.')" class="key m-width">.</button>
                 <button onclick="sendKey('/')" class="key m-width">/</button>
                 <button onclick="sendKey('SHIFT')" class="key xxl-width vertical-center">Shift</button>
             </div>
+
             <!-- Sixth Row -->
             <div class="row">
                 <button onclick="sendKey('CTRL')" class="key l-width vertical-center">Ctrl</button>
-                <button class="key m-width vertical-center">&nbsp;</button>
-                <button onclick="sendKey('ALT')" class="key m-width vertical-center">Alt</button>
+                <button onclick="sendKey('ALT')" class="key l-width vertical-center">Alt</button>
                 <button onclick="sendKey('SPACE')" class="key spacebar-width">&nbsp;</button>
-                <button onclick="sendKey('ALT')" class="key m-width vertical-center">Alt</button>
-                <button class="key m-width vertical-center">&nbsp;</button>
-                <button class="key m-width vertical-center">&nbsp;</button>
+                <button onclick="sendKey('ALT')" class="key l-width vertical-center">Alt</button>
                 <button onclick="sendKey('CTRL')" class="key l-width vertical-center">Ctrl</button>
             </div>
+
+            <!-- Seventh Row (Arrow Keys) -->
+            <div class="row arrow-keys-row">
+                <div class="spacer"></div>
+                <div class="arrow-keys">
+                    <button onclick="sendKey('LEFT')" class="key l-width arrow-key vertical-center">&#8592;</button>
+                    <button onclick="sendKey('UP')" class="key l-width arrow-key vertical-center">&#8593;</button>
+                    <button onclick="sendKey('DOWN')" class="key l-width arrow-key vertical-center">&#8595;</button>
+                    <button onclick="sendKey('RIGHT')" class="key l-width arrow-key vertical-center">&#8594;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Type a Full String (One Request) -->
+        <div class="send-string-container">
+            <h2>Type and Send a Full String</h2>
+            <input type="text" id="full-string" placeholder="Enter text here..." />
+            <button type="button" onclick="sendFullString()">Send String</button>
+        </div>
+
+        <!-- BIOS Configuration -->
+        <div class="bios-config">
+            <h2>BIOS Key Configuration</h2>
+            <form id="bios-form">
+                <label for="bios-key">Key or Key Combination (e.g., F8, CTRL+V):</label>
+                <input type="text" id="bios-key" name="bios-key" placeholder="Enter key(s)" required>
+                
+                <label for="bios-repeats">Number of Repetitions:</label>
+                <input type="number" id="bios-repeats" name="bios-repeats" min="1" max="10" value="1">
+                
+                <button type="button" onclick="saveBiosConfig()">Save</button>
+                <button type="button" onclick="removeBiosConfig()">Remove</button>
+            </form>
+            <p id="bios-status"></p>
         </div>
     </div>
 </body>
