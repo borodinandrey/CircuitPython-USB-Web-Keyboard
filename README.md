@@ -4,7 +4,8 @@
 
 I needed a keyboard to navigate the BIOS of an old PC, but I didn't have any keyboards at home. So, I decided to create one! This is a **CircuitPython-based USB HID Keyboard with a Web UI**.
 
-<img width="1438" alt="image" src="https://github.com/user-attachments/assets/5c1e79b2-025a-4bd7-b1cd-3b952d1faaec">
+<img width="1438" alt="image" src="<img width="1440" alt="image" src="https://github.com/user-attachments/assets/40628f6e-8c1e-4f07-9588-699af144afe3" />
+">
 
 ### How It Works:
 1. **Plug your Wi-Fi-enabled CircuitPython device** into a USB port.
@@ -23,7 +24,7 @@ I needed a keyboard to navigate the BIOS of an old PC, but I didn't have any key
 
 ### What it can't do (yet)
 
-- **Shortcuts** like CTRL+Z and any others, only single key presses are supported
+- **Shortcuts** like CTRL+Z and any others, only single key presses are supported but you can use sticky keys in windows
 
 ---
 
@@ -53,15 +54,13 @@ I needed a keyboard to navigate the BIOS of an old PC, but I didn't have any key
 
 ### Step 2: Set Up Project Files
 
-1. **Copy the following files** to the `CIRCUITPY` drive:
-   - `code.py`: Main script for handling server and key presses.
-   - `keycodes.py`: Contains the key mapping.
-   - `index.html`: The web interface for the keyboard.
-   - `style.css`: Styles for the keyboard layout.
+1. **Copy the  files** to the `CIRCUITPY` drive:
 
-2. **Download the [CircuitPython Library Bundle](https://circuitpython.org/libraries)** for your specific CircuitPython version.
+2. **Rename `boot_rename.py` to `boot.py` and copy** to the `CIRCUITPY` drive. WARNING: This is needed to support keyboard in BIOSes, but will disable the storage drive mode.
 
-3. **From the bundle archive**, copy the following folder and files to the `lib` folder on the `CIRCUITPY` drive:
+3. **Download the [CircuitPython Library Bundle](https://circuitpython.org/libraries)** for your specific CircuitPython version.
+
+4. **From the bundle archive**, copy the following folder and files to the `lib` folder on the `CIRCUITPY` drive:
    - **Folder**:
      - `adafruit_hid`
      - `adafruit_httpserver`
