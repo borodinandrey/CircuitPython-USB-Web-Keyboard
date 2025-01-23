@@ -4,8 +4,7 @@
 
 I needed a keyboard to navigate the BIOS of an old PC, but I didn't have any keyboards at home. So, I decided to create one! This is a **CircuitPython-based USB HID Keyboard with a Web UI**.
 
-<img width="1438" alt="image" src="<img width="1440" alt="image" src="https://github.com/user-attachments/assets/40628f6e-8c1e-4f07-9588-699af144afe3" />
-">
+<img width="1440" alt="image" src="https://github.com/user-attachments/assets/40628f6e-8c1e-4f07-9588-699af144afe3"/>
 
 ### How It Works:
 1. **Plug your Wi-Fi-enabled CircuitPython device** into a USB port.
